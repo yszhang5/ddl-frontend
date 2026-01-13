@@ -1,38 +1,47 @@
-# ddl-frontend
+## 接口
+    // 认证相关
+    auth: {
+        login: (credentials) => api.post('/auth/login', credentials),
+        register: (userData) => api.post('/auth/register', userData),
+        logout: () => api.post('/auth/logout')
+    },
 
-This template should help get you started developing with Vue 3 in Vite.
+    // 任务相关
+    tasks: {
+        getAll: (params) => api.get('/tasks', { params }),
+        getById: (uuid) => api.get(`/tasks/${uuid}`),
+        create: (taskData) => api.post('/tasks', taskData),
+        update: (uuid, taskData) => api.put(`/tasks/${uuid}`, taskData),
+        delete: (uuid) => api.delete(`/tasks/${uuid}`),
+        updateProgress: (uuid, progressData) => api.patch(`/tasks/${uuid}/progress`, progressData)
+    },
 
-## Recommended IDE Setup
+    // 统计相关
+    statistics: {
+        getApiStats: () => api.get('/statistics/api/data'),
+        resetApiStats: () => api.post('/statistics/api/reset')
+    },
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+    // 管理员相关
+    admin: {
+        getUsers: () => api.get('/admin/users'),
+        toggleUserStatus: (userId) => api.patch(`/admin/users/${userId}/status`),
+        getSessionStats: () => api.get('/admin/session/statistics')
+    }
 
-## Recommended Browser Setup
+## 项目结构
+    ddl-frontend/
+    ├── src/
+    │   ├── components/          # 可复用组件
+    │   ├── views/              # 页面组件
+    │   ├── router/             # 路由配置
+    │   ├── store/              # 状态管理
+    │   ├── api/                # API接口
+    │   ├── utils/              # 工具函数
+    │   ├── assets/             # 静态资源
+    │   ├── App.vue             # 根组件
+    │   └── main.js             # 入口文件
+    ├── package.json
+    ├── index.html
+    └── vite.config.js
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
