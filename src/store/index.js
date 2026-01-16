@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import api from '../api'
+import { MOCK_MODE, MOCK_USERS, MOCK_TASKS, MOCK_STATISTICS, MOCK_USERS_LIST, generateMockToken, mockDelay } from '../utils/mockData'
 
 export default createStore({
     state: {
@@ -33,6 +34,30 @@ export default createStore({
     },
     actions: {
         async login({ commit }, credentials) {
+            // Mock模式：检查是否是测试账号
+            if (MOCK_MODE) {
+                const mockUser = MOCK_USERS[credentials.username]
+                if (mockUser && mockUser.password === credentials.password) {
+                    await mockDelay(300) // 模拟网络延迟
+                    const token = generateMockToken(credentials.username)
+                    const user = {
+                        id: mockUser.id,
+                        username: mockUser.username,
+                        email: mockUser.email,
+                        role: mockUser.role
+                    }
+                    commit('SET_TOKEN', token)
+                    commit('SET_USER', user)
+                    // 初始化mock任务数据
+                    commit('SET_TASKS', MOCK_TASKS)
+                    console.log('✅ Mock模式：使用测试账号登录成功', user)
+                    return { success: true }
+                } else if (mockUser) {
+                    return { success: false, error: '密码错误' }
+                }
+                // 如果不是mock账号，继续尝试真实API
+            }
+
             try {
                 const response = await api.auth.login(credentials)
 
@@ -45,13 +70,54 @@ export default createStore({
                     return { success: false, error: response.data.msg || '登录失败' }
                 }
             } catch (error) {
-                return { success: false, error: '网络错误，请稍后重试' }
+                console.error('登录错误:', error)
+                if (error.response) {
+                    // 服务器返回了错误响应
+                    const status = error.response.status
+                    const message = error.response.data?.msg || error.response.data?.message
+                    if (status === 401) {
+                        return { success: false, error: '用户名或密码错误' }
+                    } else if (status === 400) {
+                        return { success: false, error: message || '请求参数错误' }
+                    } else if (status >= 500) {
+                        return { success: false, error: '服务器错误，请稍后重试' }
+                    } else {
+                        return { success: false, error: message || '登录失败' }
+                    }
+                } else if (error.request) {
+                    // 请求已发出但没有收到响应 - 在mock模式下提供友好提示
+                    if (MOCK_MODE) {
+                        return { 
+                            success: false, 
+                            error: '无法连接到服务器。提示：可以使用测试账号 testuser/123456 或 admin/admin123 登录（Mock模式）' 
+                        }
+                    }
+                    return { success: false, error: '无法连接到服务器，请检查网络连接或确认后端服务是否运行' }
+                } else {
+                    // 其他错误
+                    return { success: false, error: error.message || '网络错误，请稍后重试' }
+                }
             }
         },
 
         async register({ commit }, userData) {
             try {
-                const response = await api.auth.register(userData)
+                // 如果有头像文件，需要转换为FormData
+                let dataToSend = userData
+                if (userData.avatar) {
+                    const formData = new FormData()
+                    formData.append('username', userData.username)
+                    formData.append('email', userData.email)
+                    formData.append('password', userData.password)
+                    formData.append('avatar', userData.avatar)
+                    dataToSend = formData
+                } else {
+                    // 移除不需要的字段
+                    const { confirmPassword, avatar, ...data } = userData
+                    dataToSend = data
+                }
+
+                const response = await api.auth.register(dataToSend)
 
                 if (response.data.code === 20000) {
                     return { success: true, message: '注册成功' }
@@ -59,7 +125,27 @@ export default createStore({
                     return { success: false, error: response.data.msg || '注册失败' }
                 }
             } catch (error) {
-                return { success: false, error: '网络错误，请稍后重试' }
+                console.error('注册错误:', error)
+                if (error.response) {
+                    // 服务器返回了错误响应
+                    const status = error.response.status
+                    const message = error.response.data?.msg || error.response.data?.message
+                    if (status === 400) {
+                        return { success: false, error: message || '请求参数错误，请检查输入信息' }
+                    } else if (status === 409) {
+                        return { success: false, error: message || '用户名或邮箱已存在' }
+                    } else if (status >= 500) {
+                        return { success: false, error: '服务器错误，请稍后重试' }
+                    } else {
+                        return { success: false, error: message || '注册失败' }
+                    }
+                } else if (error.request) {
+                    // 请求已发出但没有收到响应
+                    return { success: false, error: '无法连接到服务器，请检查网络连接或确认后端服务是否运行' }
+                } else {
+                    // 其他错误
+                    return { success: false, error: error.message || '网络错误，请稍后重试' }
+                }
             }
         },
 
@@ -76,6 +162,15 @@ export default createStore({
 
         async fetchTasks({ commit, state }) {
             commit('SET_LOADING', true)
+            
+            // Mock模式：返回mock数据
+            if (MOCK_MODE && state.token && state.token.startsWith('mock-token')) {
+                await mockDelay(300)
+                commit('SET_TASKS', MOCK_TASKS)
+                commit('SET_LOADING', false)
+                return
+            }
+
             try {
                 const response = await api.tasks.getAll()
 
@@ -84,6 +179,10 @@ export default createStore({
                 }
             } catch (error) {
                 console.error('获取任务列表失败:', error)
+                // 如果失败且是mock模式，使用mock数据
+                if (MOCK_MODE && state.token && state.token.startsWith('mock-token')) {
+                    commit('SET_TASKS', MOCK_TASKS)
+                }
             } finally {
                 commit('SET_LOADING', false)
             }
