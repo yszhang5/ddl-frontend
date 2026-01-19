@@ -1,6 +1,6 @@
-import { createStore } from 'vuex'
+import {createStore} from 'vuex'
 import api from '../api'
-import { MOCK_MODE, MOCK_USERS, MOCK_TASKS, MOCK_STATISTICS, MOCK_USERS_LIST, generateMockToken, mockDelay } from '../utils/mockData'
+import {generateMockToken, MOCK_MODE, MOCK_TASKS, MOCK_USERS, mockDelay} from '../utils/mockData'
 
 export default createStore({
     state: {
@@ -61,7 +61,7 @@ export default createStore({
             try {
                 const response = await api.auth.login(credentials)
 
-                if (response.data.code === 20000) {
+                if (response.data.code === 200) {
                     const { token, user } = response.data.data
                     commit('SET_TOKEN', token)
                     commit('SET_USER', user)
@@ -102,24 +102,17 @@ export default createStore({
 
         async register({ commit }, userData) {
             try {
-                // 如果有头像文件，需要转换为FormData
-                let dataToSend = userData
+                const formData = new FormData()
+                formData.append('username', userData.username)
+                formData.append('email', userData.email)
+                formData.append('password', userData.password)
                 if (userData.avatar) {
-                    const formData = new FormData()
-                    formData.append('username', userData.username)
-                    formData.append('email', userData.email)
-                    formData.append('password', userData.password)
                     formData.append('avatar', userData.avatar)
-                    dataToSend = formData
-                } else {
-                    // 移除不需要的字段
-                    const { confirmPassword, avatar, ...data } = userData
-                    dataToSend = data
+
                 }
+                const response = await api.auth.register(formData)
 
-                const response = await api.auth.register(dataToSend)
-
-                if (response.data.code === 20000) {
+                if (response.data.code === 200) {
                     return { success: true, message: '注册成功' }
                 } else {
                     return { success: false, error: response.data.msg || '注册失败' }

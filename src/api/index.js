@@ -112,7 +112,7 @@ export default {
     // 认证相关
     auth: {
         login: (credentials) => api.post('/auth/login', credentials),
-        register: (userData) => api.post('/auth/register', userData),
+        register: (userData, avatar) => api.post('/auth/register', userData, avatar),
         logout: () => api.post('/auth/logout')
     },
 

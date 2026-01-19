@@ -9,7 +9,7 @@
       <router-link to="/statistics" class="nav-link">统计</router-link>
     </div>
     <div class="navbar-user">
-      <span class="username">{{ user.username }}</span>
+      <span class="username">{{ user?.username }}</span>
       <button @click="logout" class="logout-btn">退出</button>
     </div>
   </nav>

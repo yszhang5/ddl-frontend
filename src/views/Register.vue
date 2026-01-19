@@ -134,7 +134,7 @@
             </label>
             <div class="avatar-preview-wrapper">
               <img id="avatarPreview" class="avatar-preview" :src="defaultAvatar" />
-              <span class="avatar-hint">自动压缩至500KB以内</span>
+<!--              <span class="avatar-hint">自动压缩至500KB以内</span>-->
             </div>
           </div>
         </div>
