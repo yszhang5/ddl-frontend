@@ -1,5 +1,5 @@
 // Mock数据配置
-export const MOCK_MODE = true // 设置为true启用mock模式
+export const MOCK_MODE = false // 设置为true启用mock模式
 
 // Mock测试账号
 export const MOCK_USERS = {
