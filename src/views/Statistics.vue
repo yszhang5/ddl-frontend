@@ -220,10 +220,10 @@ export default {
   margin-bottom: 30px;
 }
 
-canvas {
-  width: 100% !important;
-  height: 300px !important;
-}
+//canvas {
+//  width: 100% !important;
+//  height: 300px !important;
+//}
 
 .table-responsive {
   width: 100%;

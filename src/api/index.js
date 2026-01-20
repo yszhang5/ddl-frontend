@@ -128,8 +128,8 @@ export default {
 
     // 统计相关
     statistics: {
-        getApiStats: () => api.get('/statistics/api/data'),
-        resetApiStats: () => api.post('/statistics/api/reset')
+        getApiStats: () => api.get('/statistics'),
+        resetApiStats: () => api.post('/statistics/reset')
     },
 
     // 管理员相关
