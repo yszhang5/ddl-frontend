@@ -186,3 +186,35 @@ body {
     }
   }
 }
+
+.nav-header {
+  background: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.nav-links span {
+  color: $text-color;
+  font-weight: 600;
+}
+
+.nav-links .divider {
+  color: $border-color;
+}
+
+.nav-links a {
+  color: $primary-color;
+  text-decoration: none;
+  font-weight: 500;
+}

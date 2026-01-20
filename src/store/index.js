@@ -61,7 +61,7 @@ export default createStore({
             try {
                 const response = await api.auth.login(credentials)
 
-                if (response.data.code === 200) {
+                if (response.data.code === 20000) {
                     const { token, user } = response.data.data
                     commit('SET_TOKEN', token)
                     commit('SET_USER', user)
@@ -112,7 +112,7 @@ export default createStore({
                 }
                 const response = await api.auth.register(formData)
 
-                if (response.data.code === 200) {
+                if (response.data.code === 20000) {
                     return { success: true, message: '注册成功' }
                 } else {
                     return { success: false, error: response.data.msg || '注册失败' }
@@ -168,7 +168,7 @@ export default createStore({
                 const response = await api.tasks.getAll()
 
                 if (response.data.code === 20000) {
-                    commit('SET_TASKS', response.data.data)
+                    commit('SET_TASKS', response.data.data.content)
                 }
             } catch (error) {
                 console.error('获取任务列表失败:', error)
