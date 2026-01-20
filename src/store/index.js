@@ -14,6 +14,8 @@ export default createStore({
             state.user = user
             if (user) {
                 localStorage.setItem('userRole', user.role || 'USER')
+                localStorage.setItem('username', user.username || '')
+                localStorage.setItem('avatar', "http://localhost:8080"+user.avatar || '')
             }
         },
         SET_TOKEN(state, token) {

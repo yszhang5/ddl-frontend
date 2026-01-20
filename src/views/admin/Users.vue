@@ -38,7 +38,7 @@
             <td>{{ user.id }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
-            <td>{{ getUserRoleLabel(user.role) }}</td>
+            <td>{{ getUserRoleLabel(user.roles) }}</td>
             <td>
                 <span :class="`status-${user.enabled ? 'active' : 'inactive'}`">
                   {{ user.enabled ? '启用' : '禁用' }}
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import {onMounted, ref} from 'vue'
 import api from '../../api'
 
 export default {
@@ -69,12 +69,10 @@ export default {
   setup() {
     const users = ref([])
 
-    const getUserRoleLabel = (role) => {
-      const roleMap = {
-        'ADMIN': '管理员',
-        'USER': '普通用户'
-      }
-      return roleMap[role] || role
+    const getUserRoleLabel = (roles) => {
+      if (roles.length === 0) return '普通用户'
+      // 获取 name 字段
+      return roles[0].name
     }
 
     const toggleUserStatus = async (user) => {
@@ -97,7 +95,7 @@ export default {
       try {
         const response = await api.admin.getUsers()
         if (response.data.code === 20000) {
-          users.value = response.data.data
+          users.value = response.data.data.content
         }
       } catch (error) {
         console.error('加载用户列表失败:', error)

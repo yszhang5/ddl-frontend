@@ -9,7 +9,17 @@
       <router-link to="/statistics" class="nav-link">统计</router-link>
     </div>
     <div class="navbar-user">
-      <span class="username">{{ user?.username }}</span>
+      <span class="username">{{ username }}</span>
+      <img
+          v-if="avatar"
+          :src="avatar"
+          alt="用户头像"
+          style="width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-top: 10px;
+            object-fit: cover;"
+      >
       <button @click="logout" class="logout-btn">退出</button>
     </div>
   </nav>
@@ -28,6 +38,8 @@ export default {
     const router = useRouter()
 
     const user = computed(() => store.state.user)
+    const username = localStorage.getItem('username')
+    const avatar = localStorage.getItem('avatar')
 
     const logout = async () => {
       await store.dispatch('logout')
@@ -36,6 +48,8 @@ export default {
 
     return {
       user,
+      username,
+      avatar,
       logout
     }
   }

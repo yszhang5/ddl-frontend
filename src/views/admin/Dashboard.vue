@@ -71,7 +71,7 @@ export default {
       try {
         const response = await api.admin.getUsers()
         if (response.data.code === 20000) {
-          const users = response.data.data
+          const users = response.data.data.content
           userStats.value.totalUsers = users.length
           userStats.value.todayLogin = users.filter(user =>
               new Date(user.lastLogin).toDateString() === new Date().toDateString()
